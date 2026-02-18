@@ -1,23 +1,19 @@
-/**
- * Global Media Control - Popup styles
- * Copyright 2025 Global Media Control contributors
- * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
- */
 * {
   box-sizing: border-box;
 }
 
 body {
   width: 380px;
-  min-height: 200px;
-  max-height: 560px;
+  height: 580px;
   margin: 0;
-  padding: 12px;
+  padding: 8px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: #0f0f0f;
   color: #fff;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .header {
@@ -32,15 +28,15 @@ body {
 
 .header-title {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 23.4px;
+  font-weight: 700;
   color: #fff;
   letter-spacing: -0.02em;
 }
 
 .header-count {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 15.6px;
+  font-weight: 700;
   color: rgba(255, 255, 255, 0.6);
   background: rgba(255, 255, 255, 0.1);
   padding: 4px 10px;
@@ -53,7 +49,7 @@ body {
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   padding-right: 4px;
 }
 
@@ -73,18 +69,18 @@ body {
 /* Card: thumbnail/cover as background */
 .card {
   position: relative;
-  border-radius: 12px;
-  min-height: 140px;
+  border-radius: 8px;
+  min-height: 85px;
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
   flex-shrink: 0;
 }
 
 .card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
 .card-bg {
@@ -119,29 +115,40 @@ body {
 .card-content {
   position: relative;
   z-index: 2;
-  padding: 12px;
+  padding: 8px;
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
+}
+
+.card-close {
+  margin-left: auto;
+  font-size: 18px;
+  font-weight: 300;
+}
+
+.card-close:hover {
+  background: rgba(255, 0, 0, 0.8);
 }
 
 .card-source {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 2px;
+  gap: 6px;
+  margin-bottom: 1px;
 }
 
 .card-favicon {
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
   flex-shrink: 0;
 }
 
 .card-tab-title {
-  font-size: 11px;
+  font-size: 13px;
+  font-weight: 700;
   color: rgba(255, 255, 255, 0.75);
   white-space: nowrap;
   overflow: hidden;
@@ -150,12 +157,12 @@ body {
 }
 
 .card-badge {
-  font-size: 9px;
-  font-weight: 600;
+  font-size: 10.4px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: 1px 4px;
+  border-radius: 3px;
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
   flex-shrink: 0;
@@ -167,9 +174,9 @@ body {
 }
 
 .card-media-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.2;
   color: #fff;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -179,41 +186,81 @@ body {
 }
 
 .card-media-artist {
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 700;
   color: rgba(255, 255, 255, 0.85);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  margin-top: 12px;
 }
 
 /* Progress */
 .card-progress {
-  margin: 4px 0;
+  margin: 2px 0;
+  pointer-events: none; /* Prevent clicks on progress container */
 }
 
 .card-progress-bar {
-  height: 4px;
+  height: 6px;
   background: rgba(255, 255, 255, 0.25);
-  border-radius: 2px;
+  border-radius: 3px;
   cursor: pointer;
-  overflow: hidden;
+  pointer-events: auto; /* Re-enable clicks only on the bar itself */
+  position: relative;
+  z-index: 10;
+  transition: background 0.2s ease;
+}
+
+.card-progress-bar:hover {
+  background: rgba(255, 255, 255, 0.35);
 }
 
 .card-progress-fill {
   height: 100%;
-  background: #fff;
-  border-radius: 2px;
+  background: #9f9f9f;
+  border-radius: 3px;
   width: 0%;
   transition: width 0.1s linear;
+  position: relative;
+}
+
+.card-progress-fill::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  background: #9f9f9f;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.card-progress-bar:hover .card-progress-fill::after {
+  opacity: 1;
 }
 
 .card-time {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.8);
-  margin-top: 2px;
+  font-size: 11.7px;
+  font-weight: 700;
+  color: #9f9f9f;
+  margin-top: 1px;
+}
+
+.card-time .time-current,
+.card-time .time-total {
+  min-width: 35px;
+  text-align: left;
+}
+
+.card-time .time-total {
+  text-align: right;
 }
 
 /* Controls */
@@ -221,61 +268,73 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 4px;
+  margin-top: 8px;
+  margin-bottom: 4px;
 }
 
 .card-controls button {
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(159, 159, 159, 0.3);
+  border-radius: 8px;
+  background: rgba(20, 20, 20, 0.8);
+  color: #9f9f9f;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, transform 0.1s;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .card-controls button:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(159, 159, 159, 0.15);
+  border-color: rgba(159, 159, 159, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .card-controls button:active {
-  transform: scale(0.95);
+  transform: translateY(0px) scale(0.95);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 }
 
 .card-controls .btn-play {
-  width: 40px;
-  height: 40px;
-  font-size: 18px;
-  background: #fff;
-  color: #000;
+  width: 28.8px;
+  height: 28.8px;
+  font-size: 12.8px;
+  background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+  color: #9f9f9f;
+  border-color: rgba(159, 159, 159, 0.4);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
 }
 
 .card-controls .btn-play:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
 }
 
 .card-controls .btn-pip {
-  margin-left: auto;
-  font-size: 14px;
+  font-size: 11px;
 }
 
 .no-media {
   padding: 32px 20px;
   text-align: center;
   color: rgba(255, 255, 255, 0.5);
-  font-size: 14px;
+  font-size: 18.2px;
+  font-weight: 700;
   line-height: 1.5;
 }
 
 .no-media small {
   display: block;
   margin-top: 8px;
-  font-size: 12px;
+  font-size: 15.6px;
+  font-weight: 700;
   color: rgba(255, 255, 255, 0.35);
 }
 

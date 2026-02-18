@@ -1,8 +1,3 @@
-/**
- * Global Media Control - Popup logic
- * Copyright 2025 Global Media Control contributors
- * Licensed under the Apache License, Version 2.0 (http://www.apache.org/licenses/LICENSE-2.0)
- */
 (function () {
   'use strict';
 
@@ -10,6 +5,7 @@
   const COUNT_EL = document.getElementById('count');
   const REFRESH_MS = 1500;
   const lastActiveByTab = new Map();
+  const hoveredCards = new Set(); // Track hovered cards
 
   // Injected into each tab to read media state and thumbnail/cover
   function getMediaInTab() {
@@ -300,6 +296,32 @@
     card.dataset.tabId = String(item.tabId);
     card.dataset.windowId = String(item.windowId);
 
+    // Restore hover state if this card was previously hovered
+    if (hoveredCards.has(item.tabId)) {
+      card.style.transform = 'translateY(-4px) scale(1.02)';
+      card.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.6)';
+    }
+
+    // Add hover event listeners to track state
+    card.addEventListener('mouseenter', (e) => {
+      // Don't track hover if clicking on a button
+      if (e.target.closest('button')) return;
+      hoveredCards.add(item.tabId);
+    });
+    
+    card.addEventListener('mouseleave', (e) => {
+      // Don't remove hover if clicking on a button
+      if (e.target.closest('button')) return;
+      hoveredCards.delete(item.tabId);
+    });
+
+    // Prevent hover state from interfering with button clicks
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('button')) {
+        e.stopPropagation();
+      }
+    });
+
     const bg = document.createElement('div');
     bg.className = 'card-bg';
     if (m.thumbnail) bg.style.backgroundImage = 'url(' + m.thumbnail + ')';
@@ -315,17 +337,17 @@
       '<span class="card-tab-title">' + escapeHtml(item.title || 'Tab') + '</span>' +
       (m.isPlaying ? '<span class="card-badge playing">Playing</span>' : '<span class="card-badge">Paused</span>') +
       '</div>' +
-      '<div class="card-media-title">' + escapeHtml(m.title) + '</div>' +
       '<div class="card-media-artist">' + escapeHtml(m.artist) + '</div>' +
-      '<div class="card-progress"><div class="card-progress-bar" data-action="seek" data-tab="' + item.tabId + '">' +
-      '<div class="card-progress-fill" style="width:' + progress + '%"></div></div>' +
-      '<div class="card-time"><span class="time-current">' + formatTime(m.currentTime) + '</span><span class="time-total">' + formatTime(m.duration) + '</span></div></div>' +
       '<div class="card-controls">' +
       '<button type="button" class="card-controls-prev" data-action="previous" data-tab="' + item.tabId + '" title="Previous">⏮</button>' +
       '<button type="button" class="btn-play" data-action="playpause" data-tab="' + item.tabId + '" title="Play/Pause">' + (m.isPlaying ? '⏸' : '▶') + '</button>' +
       '<button type="button" data-action="next" data-tab="' + item.tabId + '" title="Next">⏭</button>' +
+      '<button type="button" class="card-close" data-action="close" data-tab="' + item.tabId + '" title="Close tab">×</button>' +
       (m.isVideo && m.pipSupported ? '<button type="button" class="btn-pip" data-action="pictureinpicture" data-tab="' + item.tabId + '" title="Picture-in-Picture">' + (m.pipActive ? '⏏' : '⊡') + '</button>' : '') +
-      '</div>';
+      '</div>' +
+      '<div class="card-progress"><div class="card-progress-bar" data-action="seek" data-tab="' + item.tabId + '">' +
+      '<div class="card-progress-fill" style="width:' + progress + '%"></div></div>' +
+      '<div class="card-time"><span class="time-current">' + formatTime(m.currentTime) + '</span><span class="time-total">' + formatTime(m.duration) + '</span></div></div>';
 
     card.appendChild(content);
     return card;
@@ -354,7 +376,7 @@
   function attachCardListeners() {
     CARDS_EL.querySelectorAll('.card').forEach((card) => {
       card.addEventListener('click', (e) => {
-        if (e.target.closest('button') || e.target.closest('[data-action="seek"]')) return;
+        if (e.target.closest('button') || e.target.closest('[data-action="seek"]') || e.target.closest('.card-progress')) return;
         const tabId = parseInt(card.dataset.tabId, 10);
         const windowId = parseInt(card.dataset.windowId, 10);
         chrome.windows.update(windowId, { focused: true }).then(() => chrome.tabs.update(tabId, { active: true })).then(() => window.close()).catch(() => {});
@@ -377,6 +399,34 @@
             args: ['seek', { percent }],
           }).catch(() => {});
         });
+
+        // Add drag functionality
+        let isDragging = false;
+        
+        el.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          e.preventDefault();
+          e.stopPropagation();
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+          if (!isDragging) return;
+          
+          const rect = el.getBoundingClientRect();
+          let percent = (e.clientX - rect.left) / rect.width;
+          percent = Math.max(0, Math.min(1, percent)); // Clamp between 0 and 1
+          
+          chrome.scripting.executeScript({
+            target: { tabId },
+            func: controlMediaInTab,
+            args: ['seek', { percent }],
+          }).catch(() => {});
+        });
+        
+        document.addEventListener('mouseup', () => {
+          isDragging = false;
+        });
+        
         return;
       }
 
@@ -387,7 +437,14 @@
             target: { tabId },
             func: controlMediaInTab,
             args: [action, {}],
-          }).then(() => setTimeout(refresh, 300)).catch(() => {});
+          }).then(() => setTimeout(refresh, 500)).catch(() => {}); // Increased delay
+        });
+      }
+
+      if (action === 'close') {
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          chrome.tabs.remove(tabId).then(() => setTimeout(refresh, 300)).catch(() => {});
         });
       }
     });
