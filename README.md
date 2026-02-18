@@ -1,3 +1,4 @@
+<img width="372" height="578" alt="V1 1 0" src="https://github.com/user-attachments/assets/e201f8d4-be63-4b26-b5b8-82a125daa8a6" />
 # Global Media Control
 
 A Chromium (Chrome, Edge, Vivaldi) extension that adds a global media control popup—similar to Chrome’s built-in media control—with stacked cards for each tab playing audio or video. Control play/pause, previous/next, seek, and picture-in-picture from one place. Card backgrounds use the current media’s thumbnail or cover art.
@@ -50,3 +51,4 @@ Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
